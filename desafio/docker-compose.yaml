@@ -3,7 +3,7 @@ version: '3'
 services:
 
   nginx:
-    build: 
+    build:
       context: ./nginx
     image: rafaelsesantos/nginx:prod
     container_name: nginx
@@ -21,16 +21,17 @@ services:
       - node-network
     volumes:
       - ./node:/usr/src/app
+      - /usr/src/app/node_modules
     container_name: app
-    #o entrypoint era o docker-entrypoint.sh padrão, mas como vamos ter que esperar o db subir, vai mudar
-    entrypoint: dockerize -wait tcp://db:3306 -timeout 20s node index.js
+    #demora para criar o banco do zero, então tem que esperar mais tempo 
+    entrypoint: dockerize -wait tcp://db:3306 -timeout 120s node index.js
     tty: true
     depends_on:
       - db
-    
+
   db:
     image: mysql:5.7
-    command: --innodb-use-native-aio=0 
+    command: --innodb-use-native-aio=0
     container_name: db
     #se cair, reinicia sozinho
     restart: always
@@ -43,10 +44,10 @@ services:
     environment:
       - MYSQL_DATABASE=nodedb
       - MYSQL_ROOT_PASSWORD=root
-#      - MYSQL_USER=root
+    #      - MYSQL_USER=root
     networks:
       - node-network
-      
+
 networks:
   node-network:
     driver: bridge

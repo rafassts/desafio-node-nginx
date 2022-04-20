@@ -11,9 +11,7 @@ const config = {
 
 const mysql = require('mysql')
 const connection = mysql.createConnection(config);
-connection.query("DELETE FROM people")
-connection.query("INSERT INTO people(name) VALUES ('Rafa')")
-connection.query("INSERT INTO people(name) VALUES ('Suzi')")
+seed();
 connection.end
 
 app.get('/', (req, res) => {
@@ -39,3 +37,20 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log('Rodando na porta ' + port)
 })
+
+function seed() {
+    try {
+        connection.query("create table people(id int not null auto_increment, name varchar(255), primary key(id));",
+            function (err, result, fields) {
+                if (err) {
+                    console.log('tabela existente')
+                } else {
+                    connection.query("INSERT INTO people(name) VALUES ('Rafa')")
+                    connection.query("INSERT INTO people(name) VALUES ('Suzi')")
+                }
+            });
+    } catch (ex) {
+        console.log(ex);
+    }
+
+}
